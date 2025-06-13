@@ -1,0 +1,80 @@
+services:
+
+  db:
+    container_name: db
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}         
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD} 
+      - POSTGRES_DB=${DATABASE_NAME}           
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbit
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQUSER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQPASS}
+      - RABBITMQ_NODENAME=rabbit@rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  app:
+    build: .
+    container_name: app
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command: >
+      sh -c "sleep 5;
+            celery -A celery_app.celery_app worker -l info -Q notifications -n worker1@%h &
+            celery -A celery_app.celery_app worker -l info -Q information -n worker2@%h &
+            celery -A celery_app.celery_app worker -l info -Q results -n worker3@%h"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "5555:5555"
+    restart: on-failure
+
+  celery_beat:  
+    build: .
+    container_name: celery_beat
+    command: >
+        sh -c "sleep 5; celery -A celery_app.celery_app beat -l info -S celery_sqlalchemy_scheduler.schedulers:DatabaseScheduler"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  rabbitmq_data:
+  postgres_data:

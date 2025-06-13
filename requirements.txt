@@ -1,0 +1,16 @@
+aiogram==3.20.0.post0
+alembic==1.7.7
+celery==5.5.3
+celery_sqlalchemy_scheduler==0.3.0
+langchain==0.3.25
+langchain_chroma==0.2.4
+langchain_community==0.3.24
+langchain_core==0.3.64
+langchain_gigachat==0.3.10
+langchain_text_splitters==0.3.8
+langgraph==0.4.8
+pyTelegramBotAPI==4.27.0
+python-dotenv==1.1.0
+pytz==2025.2
+SQLAlchemy==1.4.48
+psycopg2-binary==2.9.10
