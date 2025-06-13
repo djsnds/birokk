@@ -18,24 +18,25 @@ celery_app.conf.update(
     timezone=timezone("UTC"),
     task_queues={
         "notifications": {
-            "exchange": "notifications",
+            "exchange": "celery",
             "exchange_type": "direct",
-            "routing_key": "notifications",
+            "routing_key": "notifications"
         },
         "information": {
-            "exchange": "information",
+            "exchange": "celery",
             "exchange_type": "direct",
-            "routing_key": "information",
+            "routing_key": "information"
         },
         "results": {
-            "exchange": "results",
+            "exchange": "celery",
             "exchange_type": "direct",
-            "routing_key": "results",
+            "routing_key": "results"
         },
     },
     task_routes={
         "send_notification": {"queue": "notifications"},
         "send_information": {"queue": "information"},
         "send_admission_list": {"queue": "results"},
-    },
+    }
 )
+

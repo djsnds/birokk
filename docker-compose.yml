@@ -53,14 +53,10 @@ services:
     container_name: celery_worker
     command: >
       sh -c "sleep 5;
-            celery -A celery_app.celery_app worker -l info -Q notifications -n worker1@%h &
-            celery -A celery_app.celery_app worker -l info -Q information -n worker2@%h &
-            celery -A celery_app.celery_app worker -l info -Q results -n worker3@%h"
+            celery -A celery_app.celery_app worker -l info -Q notifications,information,results"
     depends_on:
       rabbitmq:
         condition: service_healthy
-    ports:
-      - "5555:5555"
     restart: on-failure
 
   celery_beat:  
