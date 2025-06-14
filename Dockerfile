@@ -1,5 +1,7 @@
 FROM python:3.11.5-slim
 
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 # Сначала копируем только requirements.txt для лучшего использования кеша слоев
