@@ -11,6 +11,7 @@ giga = GigaChat(
     model="GigaChat",
     verify_ssl_certs=False,
     timeout=1200,
+    scope="GIGACHAT_API_B2B",
 )
 
 
